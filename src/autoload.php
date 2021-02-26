@@ -7,7 +7,8 @@ spl_autoload_register(
         static $classes = null;
         if ($classes === null) {
             $classes = array(
-                'time' => '/Time.php'
+                'time' => '/Time.php',
+                'event' => '/Event.php'
             );
         }
         $cn = strtolower($class);

@@ -20,6 +20,16 @@ class Time {
     return $this->secondsToDays($this->timestamp) - $this->secondsToDays($other_time->timestamp);
   }
 
+  public function timestamp(): int {
+    return $this->timestamp;
+  }
+
+  public function addToTimestamp(string $interval): int {
+    $date = new DateTime(strftime('%Y-%m-%d', $this->timestamp));
+    date_add($date, date_interval_create_from_date_string($interval));
+    return $date->getTimestamp();
+  }
+
   private function secondsToDays(int $seconds): int {
     return intval(floor($seconds / 60 / 60 / 24));
   }

@@ -1,6 +1,12 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 include 'config.php';
+include_once 'src/Time.php';
+include_once 'src/Event.php';
 
 ?>
 <!DOCTYPE html>
@@ -12,6 +18,8 @@ include 'config.php';
 </head>
 <body>
 <?php
+
+$now = Time::fromString('now');
 
 try {
   $pdo = new PDO("mysql:host=".MYSQL_HOST.";dbname=".MYSQL_DBNAME, MYSQL_USER, MYSQL_PASS, [
@@ -53,6 +61,13 @@ foreach ($stocks as $stock) {
       $moment = $event['moment'];
       $moment_timestamp = strtotime($event['moment']);
       echo "&nbsp;&nbsp;> ". $event['stock_change'] . " since ". $event['moment'] ." (".strtotime($event['moment']).") <br>";
+      echo "&nbsp;&nbsp;&nbsp;&nbsp;". $flow['regularity'] . "<br>";
+
+      if ($now->daysSince(new Time($moment_timestamp)) > 0) {
+        // moment is in the past
+      } else {
+        // moment is in the future
+      }
     }
 
   }
