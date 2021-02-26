@@ -36,6 +36,9 @@ $stocks = $stmt->fetchAll();
 
 // For each
 foreach ($stocks as $stock) {
+  $days_to_generate = 0;
+  $min_timestamp = Time::fromString('now')->timestamp();
+  $max_timestamp = Time::fromString('now')->timestamp();
   echo $stock['name']."<br />\n";
   $stock_id = $stock['id'];
   $initial_value = $stock['initial_value'];
@@ -58,11 +61,18 @@ foreach ($stocks as $stock) {
     foreach ($flow_events as $event) {
       $repetitions = $event['repetitions'];
       $stock_change = $event['stock_change']; // quantity
-      $moment = $event['moment'];
+      $moment = Time::fromString($event['moment']);
+      $evt = new Event($moment, $flow['regularity'], $repetitions);
       $moment_timestamp = strtotime($event['moment']);
       echo "&nbsp;&nbsp;> ". $event['stock_change'] . " since ". $event['moment'] ." (".strtotime($event['moment']).") <br>";
       echo "&nbsp;&nbsp;&nbsp;&nbsp;". $flow['regularity'] . "<br>";
 
+      if ($evt->minTimestamp() < $min_timestamp) {
+        $min_timestamp = $evt->minTimestamp();
+      }
+      if ($evt->maxTimestamp() > $max_timestamp) {
+        $max_timestamp = $evt->maxTimestamp();
+      }
       if ($now->daysSince(new Time($moment_timestamp)) > 0) {
         // moment is in the past
       } else {
@@ -71,6 +81,9 @@ foreach ($stocks as $stock) {
     }
 
   }
+
+  echo strftime('%Y-%m-%d', $min_timestamp). "<br>";
+  echo strftime('%Y-%m-%d', $max_timestamp). "<br>";
 
 }
 ?>

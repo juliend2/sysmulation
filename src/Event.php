@@ -22,6 +22,13 @@ class Event {
     return strftime(self::DATE_FORMAT, $this->moment->timestamp());
   }
 
+  public function minTimestamp(): int {
+    return strtotime($this->minDate());
+  }
+
+  public function maxTimestamp(): int {
+    return strtotime($this->maxDate());
+  }
 
   public function maxDate(): string {
     return strftime(self::DATE_FORMAT, $this->moment->addToTimestamp($this->whatToAdd()));
