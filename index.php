@@ -27,7 +27,7 @@ try {
   ]);
   //echo "Connected to $dbname at $host successfully.";
 } catch (PDOException $pe) {
-  die("Could not connect to the database $dbname :" . $pe->getMessage());
+  die("Could not connect to the database ".MYSQL_DBNAME." :" . $pe->getMessage());
 }
 
 $stmt = $pdo->prepare("SELECT * FROM stocks");
@@ -84,6 +84,13 @@ foreach ($stocks as $stock) {
 
   echo strftime('%Y-%m-%d', $min_timestamp). "<br>";
   echo strftime('%Y-%m-%d', $max_timestamp). "<br>";
+
+  echo floor(($max_timestamp - $min_timestamp) / 60 / 60 / 24) . " days<br>";
+
+  // Next steps:
+
+  # 1. for each day,
+  #   calculate the current stock according to all the states in which we are because of the flow_events
 
 }
 ?>

@@ -2,6 +2,8 @@
 
 class Time {
 
+  const DATE_FORMAT = '%Y-%m-%d';
+
   private $timestamp;
 
   public function __construct(int $timestamp) {
@@ -22,6 +24,10 @@ class Time {
 
   public function timestamp(): int {
     return $this->timestamp;
+  }
+
+  public function date(): string {
+    return strftime(self::DATE_FORMAT, $this->timestamp());
   }
 
   public function addToTimestamp(string $interval): int {

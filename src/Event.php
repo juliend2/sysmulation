@@ -7,11 +7,17 @@ class Event {
   private $moment;
   private $interval;
   private $repetitions;
+  private $stock_change;
 
-  public function __construct(Time $moment, string $interval, int $reps) {
+  public function __construct(Time $moment, string $interval, int $stock_change, int $reps = 0) {
     $this->moment = $moment;
     $this->interval = $interval;
+    $this->stock_change = $stock_change;
 		$this->repetitions = $reps;
+  }
+
+  public function stockChange(): int {
+    return $this->stock_change;
   }
 
   public function moment(): Time {
@@ -19,7 +25,7 @@ class Event {
   }
 
   public function minDate(): string {
-    return strftime(self::DATE_FORMAT, $this->moment->timestamp());
+    return $this->moment->date();
   }
 
   public function minTimestamp(): int {
@@ -32,6 +38,10 @@ class Event {
 
   public function maxDate(): string {
     return strftime(self::DATE_FORMAT, $this->moment->addToTimestamp($this->whatToAdd()));
+  }
+
+  public function daysSince(self $other_event): int {
+    return intval((strtotime($this->maxDate()) - $other_event->minTimestamp()) / 60 / 60 / 24);
   }
 
   private function whatToAdd(): string {
@@ -49,4 +59,5 @@ class Event {
       'every second' => 'seconds',
     ][$this->interval];
   }
+
 }

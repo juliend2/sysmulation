@@ -8,7 +8,8 @@ spl_autoload_register(
         if ($classes === null) {
             $classes = array(
                 'time' => '/Time.php',
-                'event' => '/Event.php'
+                'event' => '/Event.php',
+                'stock' => '/Stock.php'
             );
         }
         $cn = strtolower($class);
