@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 include 'config.php';
 include_once 'src/Time.php';
 include_once 'src/Event.php';
+include_once 'src/Stock.php';
 
 ?>
 <!DOCTYPE html>
@@ -39,7 +40,6 @@ foreach ($stocks as $stock) {
   $days_to_generate = 0;
   $min_timestamp = Time::fromString('now')->timestamp();
   $max_timestamp = Time::fromString('now')->timestamp();
-  echo $stock['name']."<br />\n";
   $stock_id = $stock['id'];
   $initial_value = $stock['initial_value'];
   $initial_time = $stock['initial_time'];
@@ -48,11 +48,13 @@ foreach ($stocks as $stock) {
   $stmt->execute(['stock_id' => $stock_id]);
   $flows = $stmt->fetchAll();
 
+  $events = [];
+
   foreach ($flows as $flow) {
-    echo "&nbsp;";
-    echo "&nbsp;";
+    # echo "&nbsp;";
+    # echo "&nbsp;";
     $flow_id = $flow['id'];
-    echo $flow['name'] . "<br>";
+    # echo $flow['name'] . "<br>";
 
     $stmt = $pdo->prepare("SELECT * FROM flow_events WHERE flow_id = :flow_id");
     $stmt->execute(['flow_id' => $flow_id]);
@@ -64,34 +66,16 @@ foreach ($stocks as $stock) {
       $moment = Time::fromString($event['moment']);
       $evt = new Event($moment, $flow['regularity'], $repetitions);
       $moment_timestamp = strtotime($event['moment']);
-      echo "&nbsp;&nbsp;> ". $event['stock_change'] . " since ". $event['moment'] ." (".strtotime($event['moment']).") <br>";
-      echo "&nbsp;&nbsp;&nbsp;&nbsp;". $flow['regularity'] . "<br>";
 
-      if ($evt->minTimestamp() < $min_timestamp) {
-        $min_timestamp = $evt->minTimestamp();
-      }
-      if ($evt->maxTimestamp() > $max_timestamp) {
-        $max_timestamp = $evt->maxTimestamp();
-      }
-      if ($now->daysSince(new Time($moment_timestamp)) > 0) {
-        // moment is in the past
-      } else {
-        // moment is in the future
-      }
+      $events []= new Event(Time::fromString($event['moment']), $flow['regularity'], $event['stock_change'], $event['repetitions']);
+
     }
 
   }
 
-  echo strftime('%Y-%m-%d', $min_timestamp). "<br>";
-  echo strftime('%Y-%m-%d', $max_timestamp). "<br>";
+  $stock = new Stock($initial_value, $events);
 
-  echo floor(($max_timestamp - $min_timestamp) / 60 / 60 / 24) . " days<br>";
-
-  // Next steps:
-
-  # 1. for each day,
-  #   calculate the current stock according to all the states in which we are because of the flow_events
-
+  var_dump($stock->timestampsWithStocks());
 }
 ?>
 

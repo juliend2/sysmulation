@@ -15,7 +15,7 @@ class Stock {
         return $timestamps_with_stocks[ strtotime($moment->date()) ];
     }
 
-    private function timestampsWithStocks() {
+    public function timestampsWithStocks() {
         /*
         1. DONE sort all the events and sort them by start time (early to late)
         2. DONE create an ARRAY OF DAYS (timestamps) between the earliest event and latest event
@@ -72,10 +72,16 @@ class Stock {
             $timestamps_kv[ $first->minTimestamp() + ($i * (60 * 60 * 24))] = [];
         }
 
+        // Set the stock changes for each day:
         foreach ($timestamps_kv as $timestamp => $_) {
             foreach ($this->events as $evnt) {
                 if (strtotime($evnt->minDate()) == $timestamp) {
                     $timestamps_kv[ $timestamp ] []= $evnt->stockChange();
+                    if ($evnt->repetitions() !== 0) {
+                        for ($i = 1; $i <= $evnt->repetitions(); $i ++) {
+                            $timestamps_kv[ $evnt->timestampForRepetition($i) ] []= $evnt->stockChange();
+                        }
+                    }
                 }
             }
         }

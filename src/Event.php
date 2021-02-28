@@ -28,6 +28,10 @@ class Event {
     return $this->moment->date();
   }
 
+  public function repetitions(): int {
+    return $this->repetitions;
+  }
+
   public function minTimestamp(): int {
     return strtotime($this->minDate());
   }
@@ -40,12 +44,20 @@ class Event {
     return strftime(self::DATE_FORMAT, $this->moment->addToTimestamp($this->whatToAdd()));
   }
 
+  // Get the repetition's timestamp
+  public function timestampForRepetition($n): int {
+    return $this->moment->addToTimestamp($this->whatToAdd($n));
+  }
+
   public function daysSince(self $other_event): int {
     return intval((strtotime($this->maxDate()) - $other_event->minTimestamp()) / 60 / 60 / 24);
   }
 
-  private function whatToAdd(): string {
-    return $this->repetitions." ".$this->interval();
+  private function whatToAdd(int $n = null): string {
+    if ($n === null) {
+      $n = $this->repetitions;
+    }
+    return $n." ".$this->interval();
   }
 
   private function interval(): string {
