@@ -4,9 +4,18 @@ use PHPUnit\Framework\TestCase;
 
 final class EventTest extends TestCase
 {
+
+  public function testMinTimestamp(): void {
+    $event = new Event(Time::fromString('2020-01-01 00:00:00'), 'monthly', -1, 2);
+    $this->assertEquals(
+      1577854800,
+      $event->minTimestamp()
+    );
+  }
+
   public function testMomentEquality(): void
   {
-    $moment = Time::fromString('now');
+    $moment = Time::now();
     $event = new Event($moment, 'monthly', -1000, 7);
     $this->assertEquals(
       $moment,

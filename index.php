@@ -20,7 +20,7 @@ include_once 'src/Stock.php';
 <body>
 <?php
 
-$now = Time::fromString('now');
+$now = Time::now();
 
 try {
   $pdo = new PDO("mysql:host=".MYSQL_HOST.";dbname=".MYSQL_DBNAME, MYSQL_USER, MYSQL_PASS, [
@@ -38,8 +38,8 @@ $stocks = $stmt->fetchAll();
 // For each
 foreach ($stocks as $stock) {
   $days_to_generate = 0;
-  $min_timestamp = Time::fromString('now')->timestamp();
-  $max_timestamp = Time::fromString('now')->timestamp();
+  $min_timestamp = Time::now()->timestamp();
+  $max_timestamp = Time::now()->timestamp();
   $stock_id = $stock['id'];
   $initial_value = $stock['initial_value'];
   $initial_time = $stock['initial_time'];

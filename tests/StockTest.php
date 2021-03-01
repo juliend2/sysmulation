@@ -43,9 +43,48 @@ final class StockTest extends TestCase
     $stock = new Stock(1000, [
         new Event(Time::fromString('2021-01-01 00:00:00'), 'monthly', -100, 7)
     ]);
+    // var_dump($stock->timestampsWithStocks());
     $this->assertEquals(
         1609477200,
         array_key_first( $stock->timestampsWithStocks() )
+    );
+  }
+
+  public function testDatetimeConversionDuringDSTChange(): void {
+    $stock = new Stock(3669, [
+      new Event(Time::fromString('2021-03-01 00:00:00'), 'monthly', -830, 7)
+    ]);
+
+    // HOUR CHANGE DURING THE NIGHT OF MARCH 13TH TO 14TH....
+
+    // first day should be good since there was no change of hour yet:
+    $this->assertEquals(
+      2839,
+      $stock->timestampsWithStocks()[ array_key_first($stock->timestampsWithStocks()) ]
+    );
+
+    // April has a shifted hour
+    // 1 month after (first repetition):
+    $this->assertEquals(
+      2009,
+      $stock->timestampsWithStocks()[ array_keys($stock->timestampsWithStocks())[31] ]
+    );
+  }
+
+
+  public function testDatetimeConversionToTimestamp(): void {
+    $stock = new Stock(3669, [
+      new Event(Time::fromString('2021-04-01 00:00:00'), 'monthly', -830, 7)
+    ]);
+    // first day:
+    $this->assertEquals(
+      2839,
+      $stock->timestampsWithStocks()[ array_key_first($stock->timestampsWithStocks()) ]
+    );
+    // 1 month after (first repetition):
+    $this->assertEquals(
+      2009,
+      $stock->timestampsWithStocks()[ array_keys($stock->timestampsWithStocks())[31] ]
     );
   }
 

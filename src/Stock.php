@@ -14,7 +14,6 @@ class Stock {
         $timestamps_with_stocks = $this->timestampsWithStocks();
         return $timestamps_with_stocks[ strtotime($moment->date()) ];
     }
-
     public function timestampsWithStocks() {
         /*
         1. DONE sort all the events and sort them by start time (early to late)
@@ -69,14 +68,15 @@ class Stock {
         //     etc...
         // ]
         for ($i = 0; $i < ($days_length + 1); $i ++) {
-            $timestamps_kv[ $first->minTimestamp() + ($i * (60 * 60 * 24))] = [];
+            $timestamps_kv[ $first->timestampPlusNDays($i) ] = [];
         }
 
         // Set the stock changes for each day:
         foreach ($timestamps_kv as $timestamp => $_) {
             foreach ($this->events as $evnt) {
-                if (strtotime($evnt->minDate()) == $timestamp) {
+                if (((new DateTimeImmutable($evnt->minDate(), new DateTimeZone( "America/Toronto" )))->setTime(0, 0))->getTimestamp() == $timestamp) {
                     $timestamps_kv[ $timestamp ] []= $evnt->stockChange();
+                    // if changes have subsequent repetitions:
                     if ($evnt->repetitions() !== 0) {
                         for ($i = 1; $i <= $evnt->repetitions(); $i ++) {
                             $timestamps_kv[ $evnt->timestampForRepetition($i) ] []= $evnt->stockChange();
@@ -85,6 +85,8 @@ class Stock {
                 }
             }
         }
+
+        ///var_dump($timestamps_kv);
 
         $timestamps_sums = [];
         // Will become:

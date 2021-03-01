@@ -3,6 +3,8 @@
 class Event {
 
   const DATE_FORMAT = '%Y-%m-%d';
+  const OLDSCHOOL_DATE_FORMAT = 'Y-m-d';
+  const OLDSCHOOL_DATETIME_FORMAT = 'Y-m-d H:i:s';
 
   private $moment;
   private $interval;
@@ -33,15 +35,21 @@ class Event {
   }
 
   public function minTimestamp(): int {
-    return strtotime($this->minDate());
+    //return strtotime($this->minDate());
+    return DateTimeImmutable::createFromFormat(self::OLDSCHOOL_DATE_FORMAT, $this->minDate(), new DateTimeZone( "America/Toronto" ))->setTime(0, 0)->getTimestamp();
   }
 
   public function maxTimestamp(): int {
-    return strtotime($this->maxDate());
+    return DateTimeImmutable::createFromFormat(self::OLDSCHOOL_DATE_FORMAT, $this->maxDate(), new DateTimeZone( "America/Toronto" ))->setTime(0, 0)->getTimestamp();
   }
 
   public function maxDate(): string {
     return strftime(self::DATE_FORMAT, $this->moment->addToTimestamp($this->whatToAdd()));
+  }
+
+  // Returns its own timestamp, + N days
+  public function timestampPlusNDays(int $days): string {
+    return strval($this->moment()->addToTimestamp($days. ' days'));
   }
 
   // Get the repetition's timestamp
