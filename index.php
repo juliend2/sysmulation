@@ -14,8 +14,9 @@ include_once 'src/Stock.php';
 <html>
 <head>
   <meta charset="utf-8" />
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-
+  <script src="d3.min.js"></script>
+  <script src="d3_timeseries.min.js"></script>
+  <link href="d3_timeseries.min.css" rel="stylesheet">
 </head>
 <body>
 <?php
@@ -26,7 +27,6 @@ try {
   $pdo = new PDO("mysql:host=".MYSQL_HOST.";dbname=".MYSQL_DBNAME, MYSQL_USER, MYSQL_PASS, [
     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
   ]);
-  //echo "Connected to $dbname at $host successfully.";
 } catch (PDOException $pe) {
   die("Could not connect to the database ".MYSQL_DBNAME." :" . $pe->getMessage());
 }
@@ -35,7 +35,7 @@ $stmt = $pdo->prepare("SELECT * FROM stocks");
 $stmt->execute(); 
 $stocks = $stmt->fetchAll();
 
-// For each
+// For each stock
 foreach ($stocks as $stock) {
   $days_to_generate = 0;
   $min_timestamp = Time::now()->timestamp();
@@ -75,7 +75,31 @@ foreach ($stocks as $stock) {
 
   $stock = new Stock($initial_value, $events);
 
-  var_dump($stock->timestampsWithStocks());
+  $data_points = [];
+  foreach ($stock->timestampsWithStocks() as $ts => $value) {
+    $data_points []= ['date' => $ts, 'n' => $value];
+  }
+  ?>
+
+  <div id="chart-<?php echo $stock_id ?>"></div>
+
+  <script>
+  var data = <?php echo json_encode($data_points) ?>;
+  data = data.map((datum)=> {
+    datum.date = new Date(datum.date * 1000); // Seconds to milliseconds, then to Date
+    return datum;
+  });
+  console.log(data)
+
+  var chart = d3_timeseries()
+              .addSerie(data,{x:'date',y:'n',diff:'n3'},{interpolate:'monotone',color:"#333"})
+              .margin.left(70)
+              .width(820)
+
+  chart('#chart-<?php echo $stock_id ?>')
+  </script>
+
+  <?php
 }
 ?>
 
