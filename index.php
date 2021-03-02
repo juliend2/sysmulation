@@ -15,7 +15,7 @@ include_once 'src/Stock.php';
 <head>
   <meta charset="utf-8" />
   <script src="d3.min.js"></script>
-  <script src="d3_timeseries.min.js"></script>
+  <script src="d3_timeseries.min.js"></script><!-- http://mcaule.github.io/d3-timeseries/ -->
   <link href="d3_timeseries.min.css" rel="stylesheet">
 </head>
 <body>
@@ -94,6 +94,7 @@ foreach ($stocks as $stock) {
   var chart = d3_timeseries()
               .addSerie(data,{x:'date',y:'n',diff:'n3'},{interpolate:'monotone',color:"#333"})
               .margin.left(70)
+              .margin.right(70)
               .width(820)
 
   chart('#chart-<?php echo $stock_id ?>')
